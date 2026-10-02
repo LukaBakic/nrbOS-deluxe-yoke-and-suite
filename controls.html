@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Navara nrbOS – Control Reference</title>
+<style>
+  :root {
+    --bg: #05070b;
+    --panel: #0b1018;
+    --accent: #00e5ff;
+    --accent-soft: #00bcd4;
+    --text-main: #e0f7fa;
+    --text-dim: #90a4ae;
+    --border: #263238;
+    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(circle at top, #111827 0%, #020309 55%, #000 100%);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .app {
+    width: 800px;
+    max-width: 95vw;
+    padding: 20px;
+    border-radius: 18px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
+    box-shadow:
+      0 0 40px rgba(0, 229, 255, 0.25),
+      0 0 120px rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .title {
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .tag {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .panel {
+    margin-top: 10px;
+    background: var(--panel);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 12px;
+  }
+  .panel-title {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-soft);
+    margin-bottom: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  th, td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #263238;
+  }
+  th {
+    text-align: left;
+    color: var(--accent-soft);
+  }
+  td.action {
+    color: var(--text-main);
+  }
+  td.keys {
+    color: var(--accent);
+    font-family: "Consolas", "SF Mono", monospace;
+  }
+  .section-label {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .link-row {
+    margin-top: 12px;
+    text-align: right;
+    font-size: 0.85rem;
+  }
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="title">Navara nrbOS – Controls</div>
+      <div class="subtitle">Key bindings for Yoke, Throttle, Flaps, Slats, Spoilers, and System Functions</div>
+    </div>
+    <div class="tag">REFERENCE PAGE</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Primary Flight Controls</div>
+    <table>
+      <tr><th>Action</th><th>Keys</th></tr>
+      <tr><td class="action">Pitch up</td><td class="keys">W</td></tr>
+      <tr><td class="action">Pitch down</td><td class="keys">S</td></tr>
+      <tr><td class="action">Roll left</td><td class="keys">A</td></tr>
+      <tr><td class="action">Roll right</td><td class="keys">D</td></tr>
+    </table>
+
+    <div class="section-label">Throttle & Lift Devices</div>
+    <table>
+      <tr><th>Action</th><th>Keys</th></tr>
+      <tr><td class="action">Throttle increase</td><td class="keys">↑ Arrow</td></tr>
+      <tr><td class="action">Throttle decrease</td><td class="keys">↓ Arrow</td></tr>
+      <tr><td class="action">Flaps extend</td><td class="keys">F</td></tr>
+      <tr><td class="action">Flaps retract</td><td class="keys">G</td></tr>
+      <tr><td class="action">Slats extend</td><td class="keys">R</td></tr>
+      <tr><td class="action">Slats retract</td><td class="keys">T</td></tr>
+      <tr><td class="action">Spoilers deploy</td><td class="keys">V</td></tr>
+      <tr><td class="action">Spoilers retract</td><td class="keys">B</td></tr>
+    </table>
+
+    <div class="section-label">System & View</div>
+    <table>
+      <tr><th>Action</th><th>Keys / UI</th></tr>
+      <tr><td class="action">Emergency FFB disconnect</td><td class="keys">EMERG FFB DISC button</td></tr>
+      <tr><td class="action">Motor self‑test</td><td class="keys">TEST MOTORS button</td></tr>
+      <tr><td class="action">Centering force adjust</td><td class="keys">Centering slider (Nm)</td></tr>
+      <tr><td class="action">Fullscreen toggle</td><td class="keys">ENTER/EXIT FULLSCREEN button</td></tr>
+    </table>
+  </div>
+
+  <div class="link-row">
+    <span>Back to flight deck: </span>
+    <a href="index.html">Open nrbOS FFB Flight Deck</a>
+  </div>
+</div>
+</body>
+</html>
