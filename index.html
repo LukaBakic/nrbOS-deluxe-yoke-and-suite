@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Navara nrbOS – High‑End FFB Flight Deck</title>
+<style>
+  :root {
+    --bg: #05070b;
+    --panel: #0b1018;
+    --accent: #00e5ff;
+    --accent-soft: #00bcd4;
+    --warn: #ffb300;
+    --error: #ff5252;
+    --ok: #00e676;
+    --text-main: #e0f7fa;
+    --text-dim: #90a4ae;
+    --border: #263238;
+    --carbon1: #111318;
+    --carbon2: #1b1f26;
+    --button-bg: #151b24;
+    --button-border: #37474f;
+    --button-hover: #1f2933;
+    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(circle at top, #111827 0%, #020309 55%, #000 100%);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .app {
+    width: 1200px;
+    max-width: 98vw;
+    padding: 20px;
+    border-radius: 18px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.04), rgba(0,0,0,0.4)),
+      repeating-linear-gradient(
+        135deg,
+        var(--carbon1) 0px,
+        var(--carbon1) 4px,
+        var(--carbon2) 4px,
+        var(--carbon2) 8px
+      );
+    box-shadow:
+      0 0 40px rgba(0, 229, 255, 0.25),
+      0 0 120px rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .title {
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .tag {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .grid-top {
+    display: grid;
+    grid-template-columns: 1.1fr 1.1fr 0.9fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .panel {
+    background: var(--panel);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    box-shadow: 0 0 18px rgba(0,0,0,0.7);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(0,229,255,0.12), transparent 55%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .panel-title {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-soft);
+  }
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin: 3px 0;
+  }
+  .kv-label { color: var(--text-dim); }
+  .kv-value { color: var(--text-main); font-weight: 500; }
+  .kv-value.ok { color: var(--ok); }
+  .kv-value.warn { color: var(--warn); }
+  .kv-value.error { color: var(--error); }
+  .status-chips {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .chip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .chip.engaged .chip-dot { background: var(--ok); }
+  .chip.limited .chip-dot { background: var(--warn); }
+  .chip.fault .chip-dot { background: var(--error); }
+  .chip.engaged { color: var(--ok); border-color: rgba(0,230,118,0.4); }
+  .chip.limited { color: var(--warn); border-color: rgba(255,179,0,0.4); }
+  .chip.fault { color: var(--error); border-color: rgba(255,82,82,0.4); }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--button-border);
+    background: var(--button-bg);
+    color: var(--text-main);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+  }
+  .btn:hover {
+    background: var(--button-hover);
+    border-color: var(--accent-soft);
+    transform: translateY(-1px);
+  }
+  .btn:active { transform: translateY(0); opacity: 0.9; }
+  .btn-primary { border-color: var(--accent-soft); color: var(--accent); }
+  .btn-danger { border-color: var(--error); color: var(--error); }
+  .btn-fullscreen { max-width: 160px; }
+  .btn-icon {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+  }
+
+  /* Yoke + throttle row */
+  .grid-bottom {
+    display: grid;
+    grid-template-columns: 1.4fr 1.1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .yoke-visual {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 10px;
+    background: radial-gradient(circle at top, #111827 0%, #020309 70%);
+    position: relative;
+    overflow: hidden;
+  }
+  .yoke-visual-inner {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .yoke-body {
+    width: 180px;
+    height: 80px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #1f2933, #0b1018);
+    border: 1px solid #37474f;
+    position: relative;
+    box-shadow:
+      0 0 18px rgba(0,0,0,0.8),
+      0 0 24px rgba(0,229,255,0.18);
+    transform-origin: center center;
+  }
+  .yoke-arm {
+    position: absolute;
+    top: 50%;
+    width: 60px;
+    height: 22px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #263238, #111827);
+    border: 1px solid #455a64;
+    transform: translateY(-50%);
+  }
+  .yoke-arm.left { left: -46px; }
+  .yoke-arm.right { right: -46px; }
+  .yoke-axis {
+    position: absolute;
+    width: 2px;
+    height: 140px;
+    background: rgba(144,164,174,0.4);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .yoke-dot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(0,229,255,0.7);
+    transition: transform 0.05s linear;
+  }
+  .arrow-label {
+    position: absolute;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+  }
+  .arrow-label.pitch {
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+  }
+  .arrow-label.roll {
+    bottom: 8px;
+    right: 8px;
+    color: var(--warn);
+  }
+  .hint {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  /* Throttle / flaps / slats / spoilers */
+  .throttle-panel {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 10px;
+    background: #05070b;
+  }
+  .lever-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+  }
+  .lever-label {
+    width: 80px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .lever-track {
+    flex: 1;
+    height: 80px;
+    border-radius: 999px;
+    border: 1px solid #37474f;
+    background: linear-gradient(to top, #111827, #020309);
+    position: relative;
+    overflow: hidden;
+  }
+  .lever-handle {
+    position: absolute;
+    left: 50%;
+    width: 18px;
+    height: 26px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #1f2933, #0b1018);
+    border: 1px solid #607d8b;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+  }
+  .lever-value {
+    width: 60px;
+    font-size: 0.8rem;
+    text-align: right;
+    color: var(--accent-soft);
+  }
+
+  /* Altitude & speed tapes */
+  .tapes-panel {
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 8px;
+    background: #05070b;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .tape {
+    position: relative;
+    height: 140px;
+    border-radius: 8px;
+    border: 1px solid #37474f;
+    background: radial-gradient(circle at center, #111827 0%, #020309 80%);
+    overflow: hidden;
+  }
+  .tape-label {
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-size: 0.8rem;
+    color: var(--accent-soft);
+  }
+  .tape-value {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+  .tape-bar {
+    position: absolute;
+    width: 6px;
+    border-radius: 999px;
+    right: 4px;
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(0,229,255,0.7);
+  }
+  .tape-scale {
+    position: absolute;
+    left: 10px;
+    top: 24px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .footer-note {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+<div class="app" id="appRoot">
+  <div class="header">
+    <div>
+      <div class="title">Navara nrbOS FFB FLIGHT DECK</div>
+      <div class="subtitle">Yoke • Throttle • Flaps • Slats • Spoilers • Altitude • Speed • Motor & FFB Telemetry</div>
+    </div>
+    <div class="tag">HIGH‑END SIMULATED COCKPIT v3.0</div>
+  </div>
+
+  <div class="grid-top">
+    <!-- MOTOR STATUS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">MOTOR STATUS</div>
+        <div class="tag">FFB ACTUATORS</div>
+      </div>
+      <div class="kv-row"><span class="kv-label">Motor 1 Torque</span><span class="kv-value" id="motor1Torque">6.8 Nm</span></div>
+      <div class="kv-row"><span class="kv-label">Motor 2 Torque</span><span class="kv-value" id="motor2Torque">6.9 Nm</span></div>
+      <div class="kv-row"><span class="kv-label">Temperature</span><span class="kv-value" id="motorTemp">42°C</span></div>
+      <div class="kv-row"><span class="kv-label">Voltage</span><span class="kv-value" id="motorVolt">24.1 V</span></div>
+      <div class="kv-row"><span class="kv-label">Current Draw</span><span class="kv-value" id="motorCurrent">3.2 A</span></div>
+      <div class="kv-row"><span class="kv-label">Cooling Fan RPM</span><span class="kv-value" id="motorFan">2800 RPM</span></div>
+
+      <div class="status-chips">
+        <div class="chip engaged" id="chipEngaged"><span class="chip-dot"></span>ENGAGED</div>
+        <div class="chip limited" id="chipLimited"><span class="chip-dot"></span>LIMITED</div>
+        <div class="chip fault" id="chipFault"><span class="chip-dot"></span>FAULT</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnTestMotors"><span class="btn-icon"></span>TEST MOTORS</button>
+        <button class="btn btn-danger" id="btnDisengageFFB"><span class="btn-icon"></span>EMERG FFB DISC</button>
+      </div>
+    </div>
+
+    <!-- LIVE TELEMETRY -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">LIVE FFB TELEMETRY</div>
+        <div class="tag">YOKE POSITION</div>
+      </div>
+      <div class="kv-row"><span class="kv-label">Pitch</span><span class="kv-value" id="pitchVal">0.0°</span></div>
+      <div class="kv-row"><span class="kv-label">Roll</span><span class="kv-value" id="rollVal">0.0°</span></div>
+      <div class="kv-row"><span class="kv-label">FFB Torque</span><span class="kv-value" id="ffbTorque">5.0 Nm</span></div>
+      <div class="kv-row"><span class="kv-label">Pilot Force</span><span class="kv-value" id="pilotForce">0.0 Nm</span></div>
+      <div class="kv-row"><span class="kv-label">Envelope</span><span class="kv-value ok" id="envelopeStatus">NORMAL</span></div>
+      <div class="kv-row"><span class="kv-label">Sync</span><span class="kv-value ok" id="syncStatus">SYNC: 100%</span></div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-fullscreen" id="btnFullscreen"><span class="btn-icon"></span>ENTER FULLSCREEN</button>
+      </div>
+    </div>
+
+    <!-- CONTROL LAWS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">CONTROL & SAFETY LAWS</div>
+        <div class="tag">nrbOS CORE</div>
+      </div>
+      <div class="kv-row"><span class="kv-label">FFB System</span><span class="kv-value ok" id="ffbSystemState">ONLINE</span></div>
+      <div class="kv-row"><span class="kv-label">Torque Limit</span><span class="kv-value" id="torqueLimit">7.00 Nm</span></div>
+      <div class="kv-row"><span class="kv-label">Phase Law</span><span class="kv-value" id="phaseLaw">TAKEOFF PROFILE</span></div>
+      <div class="lever-row">
+        <span class="lever-label">Centering</span>
+        <input type="range" id="centeringSlider" min="0.8" max="2.0" step="0.1" value="1.5">
+        <span class="lever-value" id="centeringValue">1.5 Nm</span>
+      </div>
+      <div class="kv-row"><span class="kv-label">Pilot Override</span><span class="kv-value" id="pilotOverride">AVAILABLE</span></div>
+      <div class="kv-row"><span class="kv-label">Soft‑Feel Fallback</span><span class="kv-value" id="softFeel">ARMED</span></div>
+      <div class="kv-row"><span class="kv-label">Self‑Test Status</span><span class="kv-value ok" id="selfTest">PASSED</span></div>
+      <div class="lever-row">
+        <span class="lever-label">EMERG</span>
+        <div class="lever-value">
+          <span id="emergText" style="font-size:0.8rem;color:#90a4ae;">FFB DISC INACTIVE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-bottom">
+    <!-- YOKE VISUAL -->
+    <div class="yoke-visual">
+      <div class="panel-header">
+        <div class="panel-title">PHYSICAL YOKE</div>
+        <div class="tag">WASD CONTROL</div>
+      </div>
+      <div class="yoke-visual-inner">
+        <div class="yoke-axis"></div>
+        <div class="yoke-body" id="yokeBody">
+          <div class="yoke-arm left"></div>
+          <div class="yoke-arm right"></div>
+        </div>
+        <div class="yoke-dot" id="yokeDot"></div>
+        <div class="arrow-label pitch" id="pitchLabel">Pitch: 0.0°</div>
+        <div class="arrow-label roll" id="rollLabel">Roll: 0.0°</div>
+      </div>
+      <div class="hint">Use <b>W/S</b> for pitch and <b>A/D</b> for roll. nrbOS applies auto‑centering, torque limits, and envelope protection.</div>
+    </div>
+
+    <!-- THROTTLE / FLAPS / SLATS / SPOILERS / ALT / SPEED -->
+    <div class="throttle-panel">
+      <div class="panel-header">
+        <div class="panel-title">THROTTLE & SURFACES</div>
+        <div class="tag">Navara Flight Controls</div>
+      </div>
+
+      <!-- Throttle -->
+      <div class="lever-row">
+        <span class="lever-label">Throttle</span>
+        <div class="lever-track" id="throttleTrack">
+          <div class="lever-handle" id="throttleHandle"></div>
+        </div>
+        <span class="lever-value" id="throttleValue">40%</span>
+      </div>
+
+      <!-- Flaps -->
+      <div class="lever-row">
+        <span class="lever-label">Flaps</span>
+        <div class="lever-track" id="flapsTrack">
+          <div class="lever-handle" id="flapsHandle"></div>
+        </div>
+        <span class="lever-value" id="flapsValue">0°</span>
+      </div>
+
+      <!-- Slats -->
+      <div class="lever-row">
+        <span class="lever-label">Slats</span>
+        <div class="lever-track" id="slatsTrack">
+          <div class="lever-handle" id="slatsHandle"></div>
+        </div>
+        <span class="lever-value" id="slatsValue">0%</span>
+      </div>
+
+      <!-- Spoilers -->
+      <div class="lever-row">
+        <span class="lever-label">Spoilers</span>
+        <div class="lever-track" id="spoilersTrack">
+          <div class="lever-handle" id="spoilersHandle"></div>
+        </div>
+        <span class="lever-value" id="spoilersValue">0%</span>
+      </div>
+
+      <!-- Altitude & Speed tapes -->
+      <div class="tapes-panel">
+        <div class="tape" id="altTape">
+          <div class="tape-label">ALTITUDE</div>
+          <div class="tape-scale">0 • 5k • 10k • 20k • 35k ft</div>
+          <div class="tape-bar" id="altBar"></div>
+          <div class="tape-value" id="altValue">3500 ft</div>
+        </div>
+        <div class="tape" id="spdTape">
+          <div class="tape-label">SPEED</div>
+          <div class="tape-scale">0 • 120 • 180 • 240 • 320 kt</div>
+          <div class="tape-bar" id="spdBar"></div>
+          <div class="tape-value" id="spdValue">180 kt</div>
+        </div>
+      </div>
+
+      <div class="footer-note">Throttle drives speed; flaps/slats/spoilers influence envelope. Altitude & speed tapes respond to your inputs in real time.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Core state
+  let pitch = 0;
+  let roll = 0;
+  let emergActive = false;
+  let ffbActive = true;
+  let centeringForce = 1.5;
+  let keys = { w:false, s:false, a:false, d:false };
+
+  let throttle = 40;   // %
+  let flaps = 0;       // degrees
+  let slats = 0;       // %
+  let spoilers = 0;    // %
+  let altitude = 3500; // ft
+  let speed = 180;     // kt
+
+  // Elements
+  const yokeBody = document.getElementById("yokeBody");
+  const yokeDot = document.getElementById("yokeDot");
+  const pitchLabel = document.getElementById("pitchLabel");
+  const rollLabel = document.getElementById("rollLabel");
+  const pitchVal = document.getElementById("pitchVal");
+  const rollVal = document.getElementById("rollVal");
+  const ffbTorqueEl = document.getElementById("ffbTorque");
+  const pilotForceEl = document.getElementById("pilotForce");
+  const envelopeStatusEl = document.getElementById("envelopeStatus");
+  const syncStatusEl = document.getElementById("syncStatus");
+  const motor1TorqueEl = document.getElementById("motor1Torque");
+  const motor2TorqueEl = document.getElementById("motor2Torque");
+  const motorTempEl = document.getElementById("motorTemp");
+  const motorVoltEl = document.getElementById("motorVolt");
+  const motorCurrentEl = document.getElementById("motorCurrent");
+  const motorFanEl = document.getElementById("motorFan");
+  const chipEngaged = document.getElementById("chipEngaged");
+  const chipLimited = document.getElementById("chipLimited");
+  const chipFault = document.getElementById("chipFault");
+  const ffbSystemStateEl = document.getElementById("ffbSystemState");
+  const phaseLawEl = document.getElementById("phaseLaw");
+  const centeringSlider = document.getElementById("centeringSlider");
+  const centeringValueEl = document.getElementById("centeringValue");
+  const emergTextEl = document.getElementById("emergText");
+  const pilotOverrideEl = document.getElementById("pilotOverride");
+  const softFeelEl = document.getElementById("softFeel");
+  const selfTestEl = document.getElementById("selfTest");
+  const btnTestMotors = document.getElementById("btnTestMotors");
+  const btnDisengageFFB = document.getElementById("btnDisengageFFB");
+  const btnFullscreen = document.getElementById("btnFullscreen");
+  const appRoot = document.getElementById("appRoot");
+
+  const throttleHandle = document.getElementById("throttleHandle");
+  const throttleValueEl = document.getElementById("throttleValue");
+  const flapsHandle = document.getElementById("flapsHandle");
+  const flapsValueEl = document.getElementById("flapsValue");
+  const slatsHandle = document.getElementById("slatsHandle");
+  const slatsValueEl = document.getElementById("slatsValue");
+  const spoilersHandle = document.getElementById("spoilersHandle");
+  const spoilersValueEl = document.getElementById("spoilersValue");
+  const altBar = document.getElementById("altBar");
+  const altValueEl = document.getElementById("altValue");
+  const spdBar = document.getElementById("spdBar");
+  const spdValueEl = document.getElementById("spdValue");
+
+  // Keyboard
+  document.addEventListener("keydown", e => {
+    if (e.key === "w") keys.w = true;
+    if (e.key === "s") keys.s = true;
+    if (e.key === "a") keys.a = true;
+    if (e.key === "d") keys.d = true;
+    if (e.key === "ArrowUp") throttle = Math.min(100, throttle + 2);
+    if (e.key === "ArrowDown") throttle = Math.max(0, throttle - 2);
+    if (e.key === "f") flaps = Math.min(30, flaps + 5);
+    if (e.key === "g") flaps = Math.max(0, flaps - 5);
+    if (e.key === "r") slats = Math.min(100, slats + 10);
+    if (e.key === "t") slats = Math.max(0, slats - 10);
+    if (e.key === "v") spoilers = Math.min(100, spoilers + 10);
+    if (e.key === "b") spoilers = Math.max(0, spoilers - 10);
+  });
+  document.addEventListener("keyup", e => {
+    if (e.key === "w") keys.w = false;
+    if (e.key === "s") keys.s = false;
+    if (e.key === "a") keys.a = false;
+    if (e.key === "d") keys.d = false;
+  });
+
+  // Centering slider
+  centeringSlider.addEventListener("input", () => {
+    centeringForce = parseFloat(centeringSlider.value);
+    centeringValueEl.textContent = centeringForce.toFixed(1) + " Nm";
+  });
+
+  // Test motors
+  btnTestMotors.addEventListener("click", () => {
+    btnTestMotors.textContent = "RUNNING SELF‑TEST…";
+    btnTestMotors.disabled = true;
+    selfTestEl.textContent = "IN PROGRESS";
+    selfTestEl.classList.remove("ok");
+    selfTestEl.classList.add("warn");
+    setTimeout(() => {
+      selfTestEl.textContent = "PASSED";
+      selfTestEl.classList.remove("warn");
+      selfTestEl.classList.add("ok");
+      btnTestMotors.textContent = "TEST MOTORS";
+      btnTestMotors.disabled = false;
+    }, 1800);
+  });
+
+  // Emergency FFB disengage
+  btnDisengageFFB.addEventListener("click", () => {
+    emergActive = !emergActive;
+    ffbActive = !emergActive;
+    if (emergActive) {
+      emergTextEl.textContent = "FFB DISC ACTIVE – SOFT‑FEEL";
+      emergTextEl.style.color = "#ff5252";
+      ffbSystemStateEl.textContent = "SOFT‑FEEL MODE";
+      ffbSystemStateEl.classList.remove("ok");
+      ffbSystemStateEl.classList.add("warn");
+      softFeelEl.textContent = "ENGAGED";
+      pilotOverrideEl.textContent = "FULL MANUAL";
+    } else {
+      emergTextEl.textContent = "FFB DISC INACTIVE";
+      emergTextEl.style.color = "#90a4ae";
+      ffbSystemStateEl.textContent = "ONLINE";
+      ffbSystemStateEl.classList.remove("warn");
+      ffbSystemStateEl.classList.add("ok");
+      softFeelEl.textContent = "ARMED";
+      pilotOverrideEl.textContent = "AVAILABLE";
+    }
+  });
+
+  // Fullscreen
+  btnFullscreen.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      appRoot.requestFullscreen().catch(() => {});
+      btnFullscreen.textContent = "EXIT FULLSCREEN";
+    } else {
+      document.exitFullscreen();
+      btnFullscreen.textContent = "ENTER FULLSCREEN";
+    }
+  });
+
+  // Main loop
+  let lastTime = performance.now();
+  function loop(now) {
+    const dt = (now - lastTime) / 1000;
+    lastTime = now;
+
+    // Yoke input
+    const inputPitch = (keys.w ? 1 : 0) + (keys.s ? -1 : 0);
+    const inputRoll  = (keys.a ? -1 : 0) + (keys.d ? 1 : 0);
+    const maxRate = 40;
+    pitch += inputPitch * maxRate * dt;
+    roll  += inputRoll  * maxRate * dt;
+
+    const maxAngle = 15;
+    pitch = Math.max(-maxAngle, Math.min(maxAngle, pitch));
+    roll  = Math.max(-maxAngle, Math.min(maxAngle, roll));
+
+    // Auto‑centering
+    const centerRate = centeringForce * 4;
+    if (!keys.w && !keys.s) pitch -= pitch * centerRate * dt;
+    if (!keys.a && !keys.d) roll -= roll * centerRate * dt;
+
+    // Yoke transform
+    const pitchOffset = pitch * -1.5;
+    const rollAngle = roll * 1.5;
+    yokeBody.style.transform = `translateY(${pitchOffset}px) rotate(${rollAngle}deg)`;
+    const dotX = roll * 4;
+    const dotY = -pitch * 4;
+    yokeDot.style.transform = `translate(${dotX}px, ${dotY}px)`;
+
+    pitchLabel.textContent = "Pitch: " + pitch.toFixed(1) + "°";
+    rollLabel.textContent  = "Roll: " + roll.toFixed(1) + "°";
+    pitchVal.textContent   = pitch.toFixed(1) + "°";
+    rollVal.textContent    = roll.toFixed(1) + "°";
+
+    // FFB torque & pilot force
+    const baseTorque = ffbActive ? 5.0 : centeringForce;
+    const torque = baseTorque + (Math.abs(pitch) + Math.abs(roll)) * 0.05;
+    const pilotForce = Math.abs(inputPitch * 0.8 + inputRoll * 0.8) * 3.0;
+    ffbTorqueEl.textContent = torque.toFixed(1) + " Nm";
+    pilotForceEl.textContent = pilotForce.toFixed(1) + " Nm";
+
+    // Envelope
+    let envelope = "NORMAL";
+    if (Math.abs(pitch) > 10 || Math.abs(roll) > 10) envelope = "TURBULENCE";
+    if (Math.abs(pitch) > 13 || Math.abs(roll) > 13) envelope = "STALL WARN";
+    envelopeStatusEl.textContent = envelope;
+    envelopeStatusEl.classList.remove("ok","warn","error");
+    if (envelope === "NORMAL") envelopeStatusEl.classList.add("ok");
+    else if (envelope === "TURBULENCE") envelopeStatusEl.classList.add("warn");
+    else envelopeStatusEl.classList.add("error");
+
+    // Sync
+    const sync = ffbActive ? 100 - Math.abs(Math.sin(now/800)) * 2 : 98;
+    syncStatusEl.textContent = "SYNC: " + sync.toFixed(0) + "%";
+
+    // Motor telemetry
+    const m1 = baseTorque + Math.sin(now/700) * 0.4;
+    const m2 = baseTorque + Math.cos(now/650) * 0.4;
+    const temp = 40 + Math.abs(Math.sin(now/1200))*4;
+    const volt = 24.1 + Math.sin(now/2000)*0.1;
+    const current = 3.0 + Math.abs(Math.sin(now/900))*0.4;
+    const fan = 2700 + Math.abs(Math.sin(now/600))*220;
+    motor1TorqueEl.textContent = m1.toFixed(1) + " Nm";
+    motor2TorqueEl.textContent = m2.toFixed(1) + " Nm";
+    motorTempEl.textContent = temp.toFixed(0) + "°C";
+    motorVoltEl.textContent = volt.toFixed(1) + " V";
+    motorCurrentEl.textContent = current.toFixed(1) + " A";
+    motorFanEl.textContent = fan.toFixed(0) + " RPM";
+
+    chipEngaged.style.opacity = ffbActive ? "1" : "0.3";
+    chipLimited.style.opacity = torque > 6.5 ? "1" : "0.3";
+    chipFault.style.opacity = emergActive ? "1" : "0.2";
+
+    // Phase law
+    if (Math.abs(pitch) < 5 && Math.abs(roll) < 5) {
+      phaseLawEl.textContent = "CRUISE PROFILE";
+    } else if (Math.abs(pitch) > 8 || Math.abs(roll) > 8) {
+      phaseLawEl.textContent = "PROTECTIVE PROFILE";
+    } else {
+      phaseLawEl.textContent = "TAKEOFF PROFILE";
+    }
+
+    // Throttle & surfaces visuals
+    const trackHeight = 80;
+    throttleHandle.style.top = (trackHeight - (throttle/100)*trackHeight - 13) + "px";
+    throttleValueEl.textContent = throttle.toFixed(0) + "%";
+
+    flapsHandle.style.top = (trackHeight - (flaps/30)*trackHeight - 13) + "px";
+    flapsValueEl.textContent = flaps.toFixed(0) + "°";
+
+    slatsHandle.style.top = (trackHeight - (slats/100)*trackHeight - 13) + "px";
+    slatsValueEl.textContent = slats.toFixed(0) + "%";
+
+    spoilersHandle.style.top = (trackHeight - (spoilers/100)*trackHeight - 13) + "px";
+    spoilersValueEl.textContent = spoilers.toFixed(0) + "%";
+
+    // Simple flight model: throttle drives speed, pitch drives altitude, surfaces affect drag
+    const dragFactor = 1 + (flaps/30)*0.4 + (slats/100)*0.3 + (spoilers/100)*0.6;
+    const targetSpeed = throttle * 3 / dragFactor; // rough mapping
+    speed += (targetSpeed - speed) * dt * 0.8;
+    altitude += (pitch * 8 - spoilers * 0.5) * dt; // pitch climbs, spoilers sink
+
+    speed = Math.max(0, Math.min(340, speed));
+    altitude = Math.max(0, Math.min(35000, altitude));
+
+    // Tapes
+    const altFrac = altitude / 35000;
+    const spdFrac = speed / 340;
+    altBar.style.height = (altFrac * 120 + 10) + "px";
+    altBar.style.bottom = "4px";
+    spdBar.style.height = (spdFrac * 120 + 10) + "px";
+    spdBar.style.bottom = "4px";
+
+    altValueEl.textContent = altitude.toFixed(0) + " ft";
+    spdValueEl.textContent = speed.toFixed(0) + " kt";
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+</script>
+</body>
+</html>
